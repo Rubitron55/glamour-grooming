@@ -1,0 +1,1699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#4B6357">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>Glamour Grooming — Client Notes</title>
+<style>
+  :root{
+    --bg: #F6F5F1;
+    --panel: #FCFBF9;
+    --ink: #1E2A28;
+    --ink-soft: #5A655F;
+    --line: #DEDAD1;
+    --line-soft: #EAE7DF;
+    --accent: #4B6357;
+    --accent-soft: #E4EAE4;
+    --brass: #B9863F;
+    --brass-soft: #F1E3CB;
+    --danger: #A8493B;
+    --radius: 10px;
+    --shadow: 0 1px 2px rgba(30,42,40,0.04), 0 6px 20px rgba(30,42,40,0.05);
+  }
+
+  *{ box-sizing: border-box; }
+
+  html, body{
+    height: 100%;
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  #app{
+    display: flex;
+    height: 100vh;
+    min-height: 560px;
+  }
+
+  /* ---------- Sidebar ---------- */
+  #sidebar{
+    width: 360px;
+    min-width: 300px;
+    max-width: 40vw;
+    background: var(--panel);
+    border-right: 1px solid var(--line);
+    display: flex;
+    flex-direction: column;
+  }
+
+  #brand{
+    padding: 22px 20px 16px;
+    border-bottom: 1px solid var(--line-soft);
+  }
+
+  #brand .mark{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 9px;
+    margin-bottom: 3px;
+  }
+
+  #brand-logo{
+    flex: none;
+    height: 40px;
+    width: auto;
+  }
+
+  #brand h1{
+    font-family: Georgia, "Iowan Old Style", "Palatino Linotype", "Book Antiqua", serif;
+    font-weight: 600;
+    font-size: 19px;
+    letter-spacing: 0.01em;
+    margin: 0;
+    color: var(--ink);
+  }
+
+  #brand p{
+    margin: 0;
+    font-size: 12.5px;
+    color: var(--ink-soft);
+    letter-spacing: 0.02em;
+  }
+
+  #search-wrap{
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--line-soft);
+    background: var(--panel);
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  #search-box{
+    position: relative;
+    flex: 1;
+    min-width: 0;
+  }
+
+  #add-btn{
+    flex: none;
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    border: 1px solid var(--line);
+    background: #fff;
+    color: var(--accent);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background .15s ease, border-color .15s ease;
+  }
+
+  #add-btn:hover{
+    background: var(--accent-soft);
+    border-color: var(--accent);
+  }
+
+  #search-box svg{
+    position: absolute;
+    left: 11px;
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 0.45;
+  }
+
+  #search{
+    width: 100%;
+    padding: 9px 12px 9px 34px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    font-size: 13.5px;
+    background: #fff;
+    color: var(--ink);
+    outline: none;
+    transition: border-color .15s ease, box-shadow .15s ease;
+  }
+
+  #search::placeholder{ color: #9AA39D; }
+
+  #search:focus{
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+  }
+
+  #count-row{
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 10px 16px 6px;
+    font-size: 11px;
+    color: var(--ink-soft);
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+  }
+
+  #count-row span.n{
+    font-family: "SF Mono", Menlo, Monaco, Consolas, monospace;
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  #archived-row{
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0 16px 8px;
+    font-size: 11.5px;
+    color: var(--ink-soft);
+  }
+  #archived-row label{ display: flex; align-items: center; gap: 6px; cursor: pointer; }
+
+  #list{
+    flex: 1;
+    overflow-y: auto;
+    padding: 4px 8px 16px;
+  }
+
+  .client-item{
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: transparent;
+    border: none;
+    border-left: 3px solid transparent;
+    border-radius: 8px;
+    padding: 9px 11px 9px 12px;
+    margin-bottom: 1px;
+    cursor: pointer;
+    font-family: inherit;
+  }
+
+  .client-item:hover{
+    background: var(--line-soft);
+  }
+
+  .client-item.active{
+    background: var(--accent-soft);
+    border-left-color: var(--brass);
+  }
+
+  .client-item .name{
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .client-item.archived .name{
+    color: var(--ink-soft);
+    text-decoration: line-through;
+  }
+
+  .client-item .meta{
+    font-size: 11.5px;
+    color: var(--ink-soft);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  #no-results{
+    padding: 28px 16px;
+    text-align: center;
+    color: var(--ink-soft);
+    font-size: 13px;
+    display: none;
+  }
+
+  /* ---------- Main panel ---------- */
+  #main{
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* ---------- Storage / save bar ---------- */
+  #storage-bar{
+    flex: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    padding: 8px 16px;
+    background: var(--panel);
+    border-bottom: 1px solid var(--line);
+    font-size: 12.5px;
+  }
+
+  #storage-state{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--ink-soft);
+    min-width: 0;
+  }
+
+  #storage-text{ white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+  #storage-dot{
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #C7CDC8; flex: none;
+  }
+  #storage-dot.ok{ background: var(--accent); }
+  #storage-dot.warn{ background: var(--brass); }
+  #storage-dot.err{ background: var(--danger); }
+  #storage-dot.busy{ background: var(--brass); animation: gg-pulse 1s ease-in-out infinite; }
+  @keyframes gg-pulse{ 50%{ opacity: .3; } }
+
+  #storage-actions{ display: flex; gap: 6px; flex: none; flex-wrap: wrap; }
+
+  .sb-btn{
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--accent);
+    background: #fff;
+    border: 1px solid var(--line);
+    padding: 5px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background .15s ease, border-color .15s ease;
+  }
+  .sb-btn:hover{ background: var(--accent-soft); border-color: var(--accent); }
+  .sb-btn.primary{ background: var(--accent); color: #fff; border-color: var(--accent); }
+  .sb-btn.primary:hover{ background: #3d5348; }
+
+  #notice-bar{
+    flex: none;
+    padding: 9px 16px;
+    font-size: 12.5px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    line-height: 1.4;
+  }
+  #notice-bar[hidden]{ display: none; }
+  #notice-bar.warn{ background: var(--brass-soft); color: #7a5a24; border-bottom: 1px solid #E4D3B4; }
+  #notice-bar.err{ background: #F3E7DF; color: var(--danger); border-bottom: 1px solid #E7CFC4; }
+  #notice-bar button{
+    font-family: inherit; font-size: 12px; font-weight: 700;
+    padding: 4px 10px; border-radius: 6px; cursor: pointer;
+    border: 1px solid currentColor; background: transparent; color: inherit;
+  }
+  #notice-bar button:hover{ background: rgba(0,0,0,0.06); }
+
+  #empty-state{
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: var(--ink-soft);
+    text-align: center;
+    padding: 40px;
+  }
+
+  #empty-state h2{
+    font-family: Georgia, "Iowan Old Style", "Palatino Linotype", "Book Antiqua", serif;
+    font-weight: 500;
+    font-size: 19px;
+    color: var(--ink);
+    margin: 14px 0 6px;
+  }
+
+  #empty-state p{
+    font-size: 13.5px;
+    margin: 0;
+    max-width: 320px;
+    line-height: 1.5;
+  }
+
+  #detail{
+    flex: 1;
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  #detail-header{
+    padding: 24px 32px 18px;
+    border-bottom: 1px solid var(--line);
+    background: var(--panel);
+  }
+
+  #detail-header h2{
+    font-family: Georgia, "Iowan Old Style", "Palatino Linotype", "Book Antiqua", serif;
+    font-weight: 600;
+    font-size: 24px;
+    margin: 0;
+    color: var(--ink);
+  }
+
+  #detail-name-row{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 10px;
+  }
+
+  #edit-client-btn{
+    flex: none;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--accent);
+    background: #fff;
+    border: 1px solid var(--accent);
+    padding: 6px 14px;
+    border-radius: 7px;
+    cursor: pointer;
+    transition: background .15s ease, color .15s ease;
+  }
+
+  #edit-client-btn:hover{
+    background: var(--accent);
+    color: #fff;
+  }
+
+  #edit-client-form{
+    display: none;
+    flex-direction: column;
+    gap: 14px;
+    max-width: 480px;
+    margin-top: 4px;
+  }
+
+  .edit-grid{
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  #detail-facts{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 22px;
+    font-size: 13px;
+    color: var(--ink-soft);
+  }
+
+  #detail-facts .fact{
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  #detail-facts a{
+    color: var(--accent);
+    text-decoration: none;
+  }
+
+  #detail-facts a:hover{ text-decoration: underline; }
+
+  #detail-facts .dot{
+    width: 3px; height: 3px; border-radius: 50%;
+    background: var(--line);
+  }
+
+  .groom-badge{
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 2px 9px;
+    border-radius: 20px;
+    font-size: 11.5px;
+    font-weight: 500;
+    background: var(--accent-soft);
+    color: var(--accent);
+  }
+
+  .groom-badge.stale{
+    background: #F3E7DF;
+    color: var(--danger);
+  }
+
+  .archived-tag{
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 9px;
+    border-radius: 20px;
+    font-size: 11.5px;
+    font-weight: 600;
+    background: #ECE7DE;
+    color: var(--ink-soft);
+  }
+
+  #notes-area{
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 20px 32px 26px;
+    overflow: hidden;
+  }
+
+  #notes-toolbar{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+
+  #notes-toolbar h3{
+    font-family: Georgia, "Iowan Old Style", "Palatino Linotype", "Book Antiqua", serif;
+    font-weight: 500;
+    font-size: 15px;
+    margin: 0;
+    color: var(--ink);
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+
+  #save-status{
+    font-size: 12px;
+    color: var(--ink-soft);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 150px;
+    justify-content: flex-end;
+  }
+
+  #save-status.dirty{ color: var(--brass); }
+  #save-status.saved{ color: var(--accent); }
+  #save-status.err{ color: var(--danger); }
+
+  #save-btn{
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: #fff;
+    background: var(--accent);
+    border: none;
+    padding: 7px 14px;
+    border-radius: 7px;
+    cursor: pointer;
+    margin-left: 10px;
+    transition: background .15s ease, transform .05s ease;
+  }
+
+  #save-btn:hover{ background: #3d5348; }
+  #save-btn:active{ transform: scale(0.98); }
+  #save-btn:disabled{ background: #C7CDC8; cursor: default; }
+
+  #notes-textarea{
+    flex: 1;
+    width: 100%;
+    resize: none;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    font-family: "SF Mono", Menlo, Monaco, Consolas, monospace;
+    font-size: 13.5px;
+    line-height: 1.65;
+    color: var(--ink);
+    background: #fff;
+    outline: none;
+    box-shadow: var(--shadow);
+    transition: border-color .15s ease;
+  }
+
+  #notes-textarea:focus{
+    border-color: var(--accent);
+  }
+
+  ::-webkit-scrollbar{ width: 9px; height: 9px; }
+  ::-webkit-scrollbar-thumb{ background: #D6D2C8; border-radius: 5px; }
+  ::-webkit-scrollbar-track{ background: transparent; }
+
+  /* ---------- Add client form ---------- */
+  #add-client-form{
+    flex: 1;
+    display: none;
+    flex-direction: column;
+    overflow-y: auto;
+  }
+
+  #add-client-header{
+    padding: 24px 32px 16px;
+    border-bottom: 1px solid var(--line);
+    background: var(--panel);
+  }
+
+  #add-client-header h2{
+    font-family: Georgia, "Iowan Old Style", "Palatino Linotype", "Book Antiqua", serif;
+    font-weight: 600;
+    font-size: 22px;
+    margin: 0;
+    color: var(--ink);
+  }
+
+  #add-client-body{
+    padding: 24px 32px 32px;
+    max-width: 480px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .field-label{
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--ink-soft);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+
+  .field-label input{
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    font-size: 14.5px;
+    font-weight: 400;
+    text-transform: none;
+    letter-spacing: normal;
+    color: var(--ink);
+    padding: 10px 12px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: #fff;
+    outline: none;
+    transition: border-color .15s ease, box-shadow .15s ease;
+  }
+
+  .field-label input:focus{
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+  }
+
+  .form-error{
+    display: none;
+    color: var(--danger);
+    font-size: 12.5px;
+    margin-top: -6px;
+  }
+
+  .form-actions{
+    display: flex;
+    gap: 10px;
+    margin-top: 6px;
+    flex-wrap: wrap;
+  }
+
+  .form-actions button{
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    font-size: 13.5px;
+    font-weight: 600;
+    padding: 9px 18px;
+    border-radius: 7px;
+    cursor: pointer;
+    transition: background .15s ease, transform .05s ease;
+  }
+
+  .btn-primary{
+    background: var(--accent);
+    color: #fff;
+    border: none;
+  }
+
+  .btn-primary:hover{ background: #3d5348; }
+  .btn-primary:active{ transform: scale(0.98); }
+
+  .btn-secondary{
+    background: #fff;
+    color: var(--ink-soft);
+    border: 1px solid var(--line);
+  }
+
+  .btn-secondary:hover{ background: var(--line-soft); }
+
+  .btn-danger{
+    background: #fff;
+    color: var(--danger);
+    border: 1px solid var(--danger);
+    margin-left: auto;
+  }
+  .btn-danger:hover{ background: var(--danger); color: #fff; }
+
+  #toast{
+    position: fixed;
+    left: 50%;
+    bottom: 24px;
+    transform: translateX(-50%) translateY(18px);
+    background: var(--ink);
+    color: #fff;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-size: 13px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .2s ease, transform .2s ease;
+    z-index: 60;
+    box-shadow: var(--shadow);
+    max-width: 80vw;
+    text-align: center;
+  }
+  #toast.show{ opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  @media (max-width: 760px){
+    #app{ flex-direction: column; height: auto; min-height: 100vh; }
+    #sidebar{ width: 100%; max-width: none; border-right: none; border-bottom: 1px solid var(--line); max-height: 46vh; }
+    #main{ min-height: 54vh; }
+    #detail-header{ padding: 18px 18px 14px; }
+    #notes-area{ padding: 14px 18px 18px; }
+  }
+</style>
+</head>
+<body>
+
+<div id="app">
+
+  <div id="sidebar">
+    <div id="brand">
+      <div class="mark">
+        <h1>Glamour Grooming</h1>
+        <img id="brand-logo" src="icon-192.png" alt="Glamour Grooming logo">
+      </div>
+      <p>Client &amp; groom notes</p>
+    </div>
+
+    <div id="search-wrap">
+      <div id="search-box">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+          <circle cx="11" cy="11" r="7" stroke="#5A655F" stroke-width="2"/>
+          <path d="M21 21L16.65 16.65" stroke="#5A655F" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <input id="search" type="text" placeholder="Search name, dog, or phone…" autocomplete="off">
+      </div>
+      <button id="add-btn" title="Add new client">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+          <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+
+    <div id="count-row">
+      <span id="count-label">Clients</span>
+      <span class="n" id="count-num">0</span>
+    </div>
+    <div id="archived-row">
+      <label><input type="checkbox" id="show-archived"> Show archived</label>
+    </div>
+
+    <div id="list"></div>
+    <div id="no-results">No clients match that search.</div>
+  </div>
+
+  <div id="main">
+
+    <div id="storage-bar">
+      <div id="storage-state">
+        <span id="storage-dot"></span>
+        <span id="storage-text">Starting…</span>
+      </div>
+      <div id="storage-actions">
+        <button id="link-file-btn" class="sb-btn primary">Link database file…</button>
+        <button id="reload-btn" class="sb-btn" hidden>Reload from file</button>
+        <button id="export-btn" class="sb-btn">Export backup</button>
+        <button id="import-btn" class="sb-btn">Import…</button>
+        <input id="import-input" type="file" accept="application/json,.json" hidden>
+      </div>
+    </div>
+
+    <div id="notice-bar" hidden></div>
+
+    <div id="empty-state">
+      <svg width="34" height="34" viewBox="0 0 24 24" fill="none">
+        <path d="M6 6L18 18M18 6L6 18" stroke="#B9863F" stroke-width="1.3" stroke-linecap="round"/>
+        <circle cx="6" cy="6" r="2.6" stroke="#4B6357" stroke-width="1.3"/>
+        <circle cx="6" cy="18" r="2.6" stroke="#4B6357" stroke-width="1.3"/>
+      </svg>
+      <h2>Select a client</h2>
+      <p>Search or pick a name from the list to view and edit their groom notes.</p>
+    </div>
+
+    <div id="detail">
+      <div id="detail-header">
+        <div id="detail-name-row">
+          <h2 id="detail-name"></h2>
+          <button id="edit-client-btn">Edit</button>
+        </div>
+        <div id="detail-facts"></div>
+
+        <div id="edit-client-form">
+          <div class="edit-grid">
+            <label class="field-label">Owner Name
+              <input id="edit-name" type="text">
+            </label>
+            <label class="field-label">Dog Information
+              <input id="edit-dog" type="text">
+            </label>
+            <label class="field-label">Phone Number
+              <input id="edit-phone1" type="tel">
+            </label>
+            <label class="field-label">Phone Number 2 (optional)
+              <input id="edit-phone2" type="tel">
+            </label>
+            <label class="field-label">Address
+              <input id="edit-address" type="text">
+            </label>
+            <label class="field-label">Last groomed (M/D/YYYY)
+              <input id="edit-lastgroom" type="text" placeholder="e.g. 7/29/2026">
+            </label>
+          </div>
+          <div id="edit-error" class="form-error">Please enter the client's name.</div>
+          <div class="form-actions">
+            <button id="save-edit-btn" class="btn-primary">Save Changes</button>
+            <button id="cancel-edit-btn" class="btn-secondary">Cancel</button>
+            <button id="archive-btn" class="btn-danger">Archive</button>
+          </div>
+        </div>
+      </div>
+      <div id="notes-area">
+        <div id="notes-toolbar">
+          <h3>Groom notes</h3>
+          <div style="display:flex; align-items:center;">
+            <span id="save-status"></span>
+            <button id="save-btn">Save notes</button>
+          </div>
+        </div>
+        <textarea id="notes-textarea" spellcheck="false" placeholder="No notes yet — start typing…"></textarea>
+      </div>
+    </div>
+
+    <div id="add-client-form">
+      <div id="add-client-header">
+        <h2>Add new client</h2>
+      </div>
+      <div id="add-client-body">
+        <label class="field-label">Owner Name
+          <input id="new-name" type="text" placeholder="e.g. Jamie Carter">
+        </label>
+        <label class="field-label">Dog Information
+          <input id="new-dog" type="text" placeholder="e.g. Bella — Goldendoodle, 35 lbs">
+        </label>
+        <label class="field-label">Phone Number
+          <input id="new-phone" type="tel" placeholder="e.g. (913) 555-0132">
+        </label>
+        <label class="field-label">Address
+          <input id="new-address" type="text" placeholder="e.g. 123 Main St, Overland Park KS">
+        </label>
+        <div id="add-error" class="form-error">Please enter the client's name.</div>
+        <div class="form-actions">
+          <button id="save-add-btn" class="btn-primary">Add Client</button>
+          <button id="cancel-add-btn" class="btn-secondary">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div id="toast"></div>
+
+<script src="seed-data.js"></script>
+<script>
+/* =========================================================================
+   Glamour Grooming — Client Notes
+   Single JSON file is the source of truth. It lives wherever you choose —
+   put it in an iCloud Drive / Dropbox / OneDrive folder and both computers
+   read & write the same file.
+   ========================================================================= */
+
+const DB_VERSION = 2;
+const LS_BACKUP_KEY = "gg-db-backup-v2";     // safety-net copy in this browser
+const IDB_NAME = "gg-store";
+const IDB_STORE = "kv";
+const IDB_HANDLE_KEY = "db-file-handle";
+
+const FS_API = ("showOpenFilePicker" in window) && ("showSaveFilePicker" in window);
+
+let db = null;                 // { version, clients: [...], meta: { updatedAt } }
+let fileHandle = null;         // FileSystemFileHandle when a file is linked
+let pendingHandle = null;      // handle awaiting a permission re-grant
+let fileName = null;
+let selectedId = null;
+let showArchived = false;
+
+let dirty = false;             // unsaved edits vs. the linked file / backup
+let saveTimer = null;
+let saving = false;
+let lastGoodSave = null;       // Date of last confirmed write
+let lastError = "";
+let lastKnownFileModified = 0; // mtime of the linked file we last read/wrote
+
+/* ------------------------------ tiny IndexedDB ---------------------------- */
+function idbOpen(){
+  return new Promise((resolve, reject) => {
+    const r = indexedDB.open(IDB_NAME, 1);
+    r.onupgradeneeded = () => r.result.createObjectStore(IDB_STORE);
+    r.onsuccess = () => resolve(r.result);
+    r.onerror = () => reject(r.error);
+  });
+}
+async function idbGet(key){
+  try{
+    const dbi = await idbOpen();
+    return await new Promise((resolve, reject) => {
+      const tx = dbi.transaction(IDB_STORE, "readonly");
+      const req = tx.objectStore(IDB_STORE).get(key);
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => reject(req.error);
+    });
+  }catch(e){ return undefined; }
+}
+async function idbSet(key, val){
+  try{
+    const dbi = await idbOpen();
+    await new Promise((resolve, reject) => {
+      const tx = dbi.transaction(IDB_STORE, "readwrite");
+      tx.objectStore(IDB_STORE).put(val, key);
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
+    });
+  }catch(e){ /* ignore */ }
+}
+async function idbDel(key){
+  try{
+    const dbi = await idbOpen();
+    await new Promise((resolve) => {
+      const tx = dbi.transaction(IDB_STORE, "readwrite");
+      tx.objectStore(IDB_STORE).delete(key);
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => resolve();
+    });
+  }catch(e){ /* ignore */ }
+}
+
+/* ------------------------------ data model ------------------------------ */
+function normalizeClient(c, i){
+  return {
+    id: String(c && c.id !== undefined && c.id !== null && c.id !== ""
+      ? c.id : ("c-" + Date.now() + "-" + i + "-" + Math.random().toString(36).slice(2, 6))),
+    name: (c && c.name) || "",
+    phone1: (c && c.phone1) || "",
+    phone2: (c && c.phone2) || "",
+    address: (c && c.address) || "",
+    dogName: (c && c.dogName) || "",
+    dogBreed: (c && c.dogBreed) || "",
+    dogInfo: (c && c.dogInfo) || "",
+    notes: (c && c.notes) || "",
+    lastGroom: (c && c.lastGroom) || "",
+    archived: !!(c && c.archived),
+    updatedAt: (c && c.updatedAt) || null,
+  };
+}
+
+function migrate(obj){
+  if (Array.isArray(obj)) obj = { version: 1, clients: obj };
+  if (!obj || !Array.isArray(obj.clients)){
+    throw new Error('That file is not a Glamour Grooming database (no "clients" list).');
+  }
+  return {
+    version: DB_VERSION,
+    meta: obj.meta && typeof obj.meta === "object" ? obj.meta : {},
+    clients: obj.clients.map(normalizeClient),
+  };
+}
+
+function seedDb(){
+  const seed = Array.isArray(window.SEED_CLIENTS) ? window.SEED_CLIENTS : [];
+  return { version: DB_VERSION, meta: { updatedAt: new Date().toISOString() },
+           clients: seed.map(normalizeClient) };
+}
+
+function serialize(){
+  db.meta = db.meta || {};
+  db.meta.updatedAt = new Date().toISOString();
+  db.meta.appVersion = DB_VERSION;
+  db.meta.clientCount = db.clients.length;
+  return JSON.stringify(db, null, 2);
+}
+
+function clientById(id){
+  return db.clients.find(c => c.id === String(id));
+}
+
+/* ------------------------------ localStorage backup -------------------- */
+let lsWorks = false;
+try{
+  localStorage.setItem("__gg_test__", "1");
+  localStorage.removeItem("__gg_test__");
+  lsWorks = true;
+}catch(e){ lsWorks = false; }
+
+function saveLocalBackup(){
+  if (!lsWorks) return;
+  try{
+    localStorage.setItem(LS_BACKUP_KEY, JSON.stringify({
+      savedAt: new Date().toISOString(),
+      fromFile: fileName || null,
+      db: db,
+    }));
+  }catch(e){ /* quota — ignore, file is the real store */ }
+}
+function loadLocalBackup(){
+  if (!lsWorks) return null;
+  try{
+    const raw = localStorage.getItem(LS_BACKUP_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw);
+  }catch(e){ return null; }
+}
+
+/* ------------------------------ file storage -------------------------- */
+async function handlePermission(handle, request){
+  if (!handle.queryPermission) return "granted"; // older impl: assume ok
+  const opts = { mode: "readwrite" };
+  let p = await handle.queryPermission(opts);
+  if (p === "granted") return "granted";
+  if (request && handle.requestPermission){
+    p = await handle.requestPermission(opts);
+  }
+  return p;
+}
+
+async function readFromFile(){
+  const file = await fileHandle.getFile();
+  const text = await file.text();
+  lastKnownFileModified = file.lastModified;
+  if (!text.trim()){
+    // brand-new empty file the user just created — write the current db into it
+    db = db || seedDb();
+    await writeToFile();
+    return;
+  }
+  db = migrate(JSON.parse(text));
+  fileName = fileHandle.name;
+  lastGoodSave = new Date(file.lastModified);
+  dirty = false;
+}
+
+async function writeToFile(){
+  const payload = serialize();
+  const writable = await fileHandle.createWritable();
+  await writable.write(payload);
+  await writable.close();
+
+  // Read it straight back and confirm it really landed.
+  const check = await fileHandle.getFile();
+  const backText = await check.text();
+  let backCount = -1;
+  try{ backCount = JSON.parse(backText).clients.length; }catch(e){}
+  if (backText.length !== payload.length || backCount !== db.clients.length){
+    throw new Error("Wrote the file but the re-read didn't match — save not confirmed.");
+  }
+  lastKnownFileModified = check.lastModified;
+  lastGoodSave = new Date();
+  dirty = false;
+}
+
+async function linkFile(mode){
+  try{
+    let handle;
+    const types = [{ description: "Glamour Grooming database",
+                     accept: { "application/json": [".json"] } }];
+    if (mode === "create"){
+      handle = await window.showSaveFilePicker({ suggestedName: "glamour-grooming.json", types });
+    } else {
+      const picked = await window.showOpenFilePicker({ types, multiple: false });
+      handle = picked[0];
+    }
+    const perm = await handlePermission(handle, true);
+    if (perm !== "granted"){ toast("Permission to use that file was declined."); return; }
+
+    fileHandle = handle;
+    fileName = handle.name;
+    pendingHandle = null;
+
+    if (mode === "create"){
+      db = db || seedDb();
+      await writeToFile();
+      toast("Database created at " + fileName + " — " + db.clients.length + " clients written.");
+    } else {
+      await readFromFile();
+      toast("Linked " + fileName + " — " + db.clients.length + " clients loaded.");
+    }
+    await idbSet(IDB_HANDLE_KEY, fileHandle);
+    saveLocalBackup();
+    clearNotice();
+    renderAll();
+  }catch(e){
+    if (e && e.name === "AbortError") return; // user cancelled the picker
+    console.error(e);
+    setError(e.message || String(e));
+    toast("Could not link file: " + (e.message || e));
+  }
+  updateStorageBar();
+}
+
+/* ------------------------------ save dispatcher ---------------------- */
+function scheduleSave(){
+  dirty = true;
+  updateStorageBar();
+  updateNoteStatus();
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(flushSave, 800);
+}
+
+async function flushSave(){
+  clearTimeout(saveTimer);
+  if (saving) return;
+  saving = true;
+  lastError = "";
+  updateStorageBar();
+  updateNoteStatus();
+
+  try{
+    if (fileHandle){
+      await writeToFile();
+      saveLocalBackup();               // keep the local safety net fresh too
+    } else if (lsWorks){
+      saveLocalBackup();
+      lastGoodSave = new Date();
+      dirty = false;
+    } else {
+      // nothing we can do — data only lives in memory
+    }
+  }catch(e){
+    console.error(e);
+    lastError = e.message || String(e);
+    try{ saveLocalBackup(); }catch(_){}   // don't lose the work
+    toast("Save failed — kept a copy in this browser. " + lastError);
+  }
+
+  saving = false;
+  updateStorageBar();
+  updateNoteStatus();
+}
+
+/* ------------------------------ cross-computer refresh --------------- */
+async function maybeReloadFromDisk(){
+  if (!fileHandle || saving) return;
+  let file;
+  try{ file = await fileHandle.getFile(); }
+  catch(e){ return; }
+  if (file.lastModified <= lastKnownFileModified) return;
+
+  if (dirty){
+    showNotice("err",
+      fileName + " was changed on another computer while you have unsaved edits here.",
+      [
+        { label: "Keep my edits", onClick: () => { lastKnownFileModified = file.lastModified; flushSave(); clearNotice(); } },
+        { label: "Discard mine & reload", onClick: async () => {
+            try{ db = migrate(JSON.parse(await file.text())); lastKnownFileModified = file.lastModified;
+                 dirty = false; lastGoodSave = new Date(file.lastModified); clearNotice(); renderAll(); }
+            catch(e){ setError(e.message); } } },
+      ]);
+    return;
+  }
+  try{
+    db = migrate(JSON.parse(await file.text()));
+    lastKnownFileModified = file.lastModified;
+    lastGoodSave = new Date(file.lastModified);
+    renderAll();
+    toast("Updated from " + fileName + " (changed on another computer).");
+  }catch(e){ /* leave current data alone */ }
+}
+
+/* ------------------------------ export / import --------------------- */
+function exportBackup(){
+  const stamp = new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-");
+  const blob = new Blob([serialize()], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "glamour-grooming-backup-" + stamp + ".json";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 2000);
+  toast("Backup downloaded (" + db.clients.length + " clients).");
+}
+
+function importBackup(file){
+  const reader = new FileReader();
+  reader.onload = async () => {
+    try{
+      const incoming = migrate(JSON.parse(reader.result));
+      if (!confirm("Replace the current list (" + db.clients.length + " clients) with the imported file ("
+                   + incoming.clients.length + " clients)?\n\nThis will be saved to your linked database file.")){
+        return;
+      }
+      db = incoming;
+      selectedId = null;
+      dirty = true;
+      renderAll();
+      await flushSave();
+      toast("Imported " + db.clients.length + " clients.");
+    }catch(e){
+      alert("Could not import that file:\n" + (e.message || e));
+    }
+  };
+  reader.readAsText(file);
+}
+
+/* ------------------------------ status UI --------------------------- */
+function fmtTime(d){
+  if (!d) return "";
+  return d.toLocaleString([], { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
+}
+
+function updateStorageBar(){
+  const dot = document.getElementById("storage-dot");
+  const text = document.getElementById("storage-text");
+  const linkBtn = document.getElementById("link-file-btn");
+  const reloadBtn = document.getElementById("reload-btn");
+
+  dot.className = "";
+  reloadBtn.hidden = !fileHandle;
+
+  if (pendingHandle){
+    dot.classList.add("warn");
+    text.textContent = "Reconnect to “" + (pendingHandle.name || "your database file") + "” to load & save";
+    linkBtn.textContent = "Reconnect";
+    linkBtn.hidden = false;
+    return;
+  }
+
+  linkBtn.textContent = fileHandle ? "Change file…" : (FS_API ? "Link database file…" : "Link file (needs Chrome/Edge)");
+  linkBtn.hidden = false;
+  linkBtn.disabled = !FS_API && !fileHandle;
+
+  if (saving){
+    dot.classList.add("busy");
+    text.textContent = "Saving to " + (fileName || "backup") + "…";
+  } else if (lastError){
+    dot.classList.add("err");
+    text.textContent = "Save failed: " + lastError + (lastGoodSave ? "  ·  last good save " + fmtTime(lastGoodSave) : "");
+  } else if (fileHandle){
+    if (dirty){
+      dot.classList.add("warn");
+      text.textContent = "Unsaved changes · " + fileName;
+    } else {
+      dot.classList.add("ok");
+      text.textContent = "Saved to " + fileName + (lastGoodSave ? " · " + fmtTime(lastGoodSave) : "");
+    }
+  } else if (lsWorks){
+    dot.classList.add("warn");
+    text.textContent = "No database file linked — saving to this browser only. Link a file to sync both computers.";
+  } else {
+    dot.classList.add("err");
+    text.textContent = "Storage unavailable — changes last only until you close. Use Export backup.";
+  }
+}
+
+function updateNoteStatus(){
+  const el = document.getElementById("save-status");
+  const btn = document.getElementById("save-btn");
+  el.className = "";
+  if (selectedId === null){ el.textContent = ""; btn.disabled = true; return; }
+  if (saving){ el.textContent = "Saving…"; btn.disabled = true; el.classList.add("dirty"); return; }
+  if (lastError){ el.textContent = "Save failed"; btn.disabled = false; el.classList.add("err"); return; }
+  if (dirty){ el.textContent = "Unsaved changes"; btn.disabled = false; el.classList.add("dirty"); return; }
+  el.textContent = lastGoodSave ? "Saved " + fmtTime(lastGoodSave) : "Saved";
+  el.classList.add("saved");
+  btn.disabled = true;
+}
+
+function setError(msg){
+  lastError = msg;
+  updateStorageBar();
+  updateNoteStatus();
+}
+
+function showNotice(kind, message, actions){
+  const bar = document.getElementById("notice-bar");
+  bar.className = kind;
+  bar.hidden = false;
+  bar.innerHTML = "";
+  const span = document.createElement("span");
+  span.textContent = message;
+  bar.appendChild(span);
+  (actions || []).forEach(a => {
+    const b = document.createElement("button");
+    b.textContent = a.label;
+    b.addEventListener("click", a.onClick);
+    bar.appendChild(b);
+  });
+}
+function clearNotice(){
+  const bar = document.getElementById("notice-bar");
+  bar.hidden = true;
+  bar.innerHTML = "";
+}
+
+let toastTimer = null;
+function toast(msg){
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove("show"), 3600);
+}
+
+/* ------------------------------ search / list ---------------------- */
+function normalize(s){ return (s || "").toLowerCase(); }
+function digitsOnly(s){ return (s || "").replace(/\D/g, ""); }
+
+function matches(client, q){
+  if (!q) return true;
+  const nq = normalize(q);
+  if (normalize(client.name).includes(nq)) return true;
+  if (normalize(client.dogName).includes(nq)) return true;
+  if (normalize(client.dogBreed).includes(nq)) return true;
+  if (normalize(client.dogInfo).includes(nq)) return true;
+  const dq = digitsOnly(q);
+  if (dq.length >= 3){
+    if (digitsOnly(client.phone1).includes(dq)) return true;
+    if (digitsOnly(client.phone2).includes(dq)) return true;
+  }
+  return false;
+}
+
+function sortKey(name){ return (name || "").replace(/^[^A-Za-z0-9]+/, "").toLowerCase(); }
+
+function dogLine(client){
+  return [client.dogName, client.dogBreed].filter(Boolean).join(" — ") || client.dogInfo || "";
+}
+
+function parseGroomDate(s){
+  const m = /(\d{1,2})\/(\d{1,2})\/(\d{2,4})/.exec((s || "").trim());
+  if (!m) return null;
+  let mo = +m[1], d = +m[2], y = +m[3];
+  if (y < 100) y += 2000;
+  if (mo < 1 || mo > 12 || d < 1 || d > 31 || y < 2000 || y > 2100) return null;
+  const dt = new Date(y, mo - 1, d);
+  return isNaN(dt.getTime()) ? null : dt;
+}
+function daysSinceGroom(client){
+  const dt = parseGroomDate(client.lastGroom);
+  if (!dt) return null;
+  return Math.floor((Date.now() - dt.getTime()) / 86400000);
+}
+/* pull the most recent leading date out of the notes, e.g. "7/29/26 same 75" */
+function latestDateInNotes(notes){
+  const re = /(?:^|\n)\s*(\d{1,2}\/\d{1,2}\/\d{2,4})/g;
+  let best = null, bestStr = "";
+  let m;
+  while ((m = re.exec(notes || "")) !== null){
+    const dt = parseGroomDate(m[1]);
+    if (dt && dt.getTime() <= Date.now() && (!best || dt > best)){ best = dt; bestStr = m[1]; }
+  }
+  return best ? { date: best, raw: bestStr } : null;
+}
+
+function visibleClients(){
+  return db.clients.filter(c => showArchived || !c.archived);
+}
+
+function renderList(){
+  const q = document.getElementById("search").value.trim();
+  const listEl = document.getElementById("list");
+  const noResultsEl = document.getElementById("no-results");
+  const filtered = visibleClients().filter(c => matches(c, q));
+  filtered.sort((a, b) => sortKey(a.name).localeCompare(sortKey(b.name)));
+
+  document.getElementById("count-num").textContent = filtered.length.toLocaleString();
+  document.getElementById("count-label").textContent = q ? "Results" : (showArchived ? "All clients" : "Clients");
+
+  listEl.innerHTML = "";
+  if (filtered.length === 0){ noResultsEl.style.display = "block"; return; }
+  noResultsEl.style.display = "none";
+
+  const frag = document.createDocumentFragment();
+  filtered.forEach(c => {
+    const btn = document.createElement("button");
+    btn.className = "client-item" + (c.id === selectedId ? " active" : "") + (c.archived ? " archived" : "");
+    btn.dataset.id = c.id;
+
+    const nameEl = document.createElement("div");
+    nameEl.className = "name";
+    nameEl.textContent = c.name || "(no name)";
+
+    const metaBits = [];
+    if (c.dogName) metaBits.push(c.dogBreed ? c.dogName + " · " + c.dogBreed : c.dogName);
+    else if (c.dogBreed) metaBits.push(c.dogBreed);
+    else if (c.dogInfo) metaBits.push(c.dogInfo);
+    if (c.phone1) metaBits.push(c.phone1);
+    const metaEl = document.createElement("div");
+    metaEl.className = "meta";
+    metaEl.textContent = metaBits.join(" · ") || "—";
+
+    btn.appendChild(nameEl);
+    btn.appendChild(metaEl);
+    btn.addEventListener("click", () => selectClient(c.id));
+    frag.appendChild(btn);
+  });
+  listEl.appendChild(frag);
+}
+
+function escapeHtml(str){
+  const div = document.createElement("div");
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+function renderDetail(){
+  const client = clientById(selectedId);
+  document.getElementById("add-client-form").style.display = "none";
+  document.getElementById("empty-state").style.display = client ? "none" : "flex";
+  document.getElementById("detail").style.display = client ? "flex" : "none";
+  if (!client) return;
+
+  document.getElementById("detail-name").textContent = client.name || "(no name)";
+  document.getElementById("edit-client-form").style.display = "none";
+  document.getElementById("detail-name-row").style.display = "flex";
+
+  const facts = document.getElementById("detail-facts");
+  facts.style.display = "flex";
+  facts.innerHTML = "";
+
+  const addFact = (html) => {
+    if (facts.children.length > 0){
+      const dot = document.createElement("span");
+      dot.className = "dot";
+      facts.appendChild(dot);
+    }
+    const f = document.createElement("span");
+    f.className = "fact";
+    f.innerHTML = html;
+    facts.appendChild(f);
+  };
+
+  if (client.archived) addFact('<span class="archived-tag">Archived</span>');
+  const dl = dogLine(client);
+  if (dl) addFact("🐾 " + escapeHtml(dl));
+  if (client.phone1) addFact('<a href="tel:' + escapeHtml(client.phone1) + '">' + escapeHtml(client.phone1) + "</a>");
+  if (client.phone2) addFact('<a href="tel:' + escapeHtml(client.phone2) + '">' + escapeHtml(client.phone2) + "</a>");
+  if (client.address) addFact(escapeHtml(client.address));
+  const ds = daysSinceGroom(client);
+  if (client.lastGroom){
+    const stale = typeof ds === "number" && ds > 180;
+    const agoTxt = typeof ds === "number" ? " · " + ds + "d ago" : "";
+    addFact('<span class="groom-badge' + (stale ? " stale" : "") + '">Last groomed '
+            + escapeHtml(client.lastGroom) + agoTxt + "</span>");
+  }
+
+  const textarea = document.getElementById("notes-textarea");
+  textarea.value = client.notes;
+  updateNoteStatus();
+}
+
+function renderAll(){
+  renderList();
+  if (selectedId !== null && !clientById(selectedId)) selectedId = null;
+  renderDetail();
+  updateStorageBar();
+}
+
+function selectClient(id){
+  selectedId = String(id);
+  document.getElementById("add-client-form").style.display = "none";
+  renderList();
+  renderDetail();
+  document.getElementById("notes-textarea").focus();
+}
+
+/* ------------------------------ notes editing --------------------- */
+function commitNotes(){
+  const client = clientById(selectedId);
+  if (!client) return;
+  const val = document.getElementById("notes-textarea").value;
+  if (val === client.notes) return;
+  client.notes = val;
+  client.updatedAt = new Date().toISOString();
+
+  // keep "last groomed" in step with dated note lines
+  const latest = latestDateInNotes(val);
+  if (latest){
+    const cur = parseGroomDate(client.lastGroom);
+    if (!cur || latest.date > cur){
+      const d = latest.date;
+      client.lastGroom = (d.getMonth() + 1) + "/" + d.getDate() + "/" + d.getFullYear();
+    }
+  }
+  scheduleSave();
+}
+
+/* ------------------------------ init ------------------------------ */
+function wireEvents(){
+  document.getElementById("search").addEventListener("input", renderList);
+
+  document.getElementById("show-archived").addEventListener("change", (e) => {
+    showArchived = e.target.checked;
+    renderList();
+  });
+
+  const ta = document.getElementById("notes-textarea");
+  ta.addEventListener("input", () => {
+    const client = clientById(selectedId);
+    if (!client) return;
+    dirty = dirty || document.getElementById("notes-textarea").value !== client.notes;
+    updateNoteStatus();
+    updateStorageBar();
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(() => { commitNotes(); }, 800);
+  });
+  ta.addEventListener("blur", () => { clearTimeout(saveTimer); commitNotes(); });
+
+  document.getElementById("save-btn").addEventListener("click", () => {
+    clearTimeout(saveTimer);
+    commitNotes();
+    flushSave();
+  });
+
+  document.getElementById("link-file-btn").addEventListener("click", async () => {
+    if (pendingHandle){
+      const perm = await handlePermission(pendingHandle, true);
+      if (perm === "granted"){
+        fileHandle = pendingHandle;
+        pendingHandle = null;
+        try{ await readFromFile(); await idbSet(IDB_HANDLE_KEY, fileHandle); clearNotice(); renderAll(); toast("Reconnected to " + fileName + "."); }
+        catch(e){ setError(e.message); }
+      } else {
+        toast("Still no permission to that file.");
+      }
+      updateStorageBar();
+      return;
+    }
+    const choice = fileHandle
+      ? "open"
+      : (confirm('Link a database file.\n\nOK = choose an EXISTING glamour-grooming.json (use this on your second computer).\nCancel = CREATE a new one from your current list (use this on the first computer).')
+          ? "open" : "create");
+    linkFile(choice);
+  });
+
+  document.getElementById("reload-btn").addEventListener("click", async () => {
+    if (!fileHandle) return;
+    if (dirty && !confirm("Discard your unsaved edits and reload from the file?")) return;
+    try{
+      const file = await fileHandle.getFile();
+      db = migrate(JSON.parse(await file.text()));
+      lastKnownFileModified = file.lastModified;
+      lastGoodSave = new Date(file.lastModified);
+      dirty = false; lastError = "";
+      clearNotice();
+      renderAll();
+      toast("Reloaded " + db.clients.length + " clients from " + fileName + ".");
+    }catch(e){ setError(e.message); }
+  });
+
+  document.getElementById("export-btn").addEventListener("click", exportBackup);
+  document.getElementById("import-btn").addEventListener("click", () =>
+    document.getElementById("import-input").click());
+  document.getElementById("import-input").addEventListener("change", (e) => {
+    if (e.target.files && e.target.files[0]) importBackup(e.target.files[0]);
+    e.target.value = "";
+  });
+
+  /* ---- add client ---- */
+  const openAddForm = () => {
+    document.getElementById("empty-state").style.display = "none";
+    document.getElementById("detail").style.display = "none";
+    document.getElementById("add-error").style.display = "none";
+    ["new-name", "new-dog", "new-phone", "new-address"].forEach(id => document.getElementById(id).value = "");
+    document.getElementById("add-client-form").style.display = "flex";
+    document.getElementById("new-name").focus();
+  };
+  document.getElementById("add-btn").addEventListener("click", openAddForm);
+  document.getElementById("cancel-add-btn").addEventListener("click", () => {
+    document.getElementById("add-client-form").style.display = "none";
+    renderDetail();
+  });
+  document.getElementById("new-name").addEventListener("input", () => {
+    document.getElementById("add-error").style.display = "none";
+  });
+  document.getElementById("save-add-btn").addEventListener("click", async () => {
+    const name = document.getElementById("new-name").value.trim();
+    if (!name){
+      document.getElementById("add-error").style.display = "block";
+      document.getElementById("new-name").focus();
+      return;
+    }
+    const c = normalizeClient({
+      name,
+      phone1: document.getElementById("new-phone").value.trim(),
+      address: document.getElementById("new-address").value.trim(),
+      dogInfo: document.getElementById("new-dog").value.trim(),
+      updatedAt: new Date().toISOString(),
+    }, db.clients.length);
+    db.clients.push(c);
+    document.getElementById("add-client-form").style.display = "none";
+    document.getElementById("search").value = "";
+    selectClient(c.id);
+    dirty = true;
+    await flushSave();
+  });
+
+  /* ---- edit client ---- */
+  document.getElementById("edit-client-btn").addEventListener("click", () => {
+    const client = clientById(selectedId);
+    if (!client) return;
+    document.getElementById("edit-name").value = client.name || "";
+    document.getElementById("edit-dog").value = dogLine(client);
+    document.getElementById("edit-phone1").value = client.phone1 || "";
+    document.getElementById("edit-phone2").value = client.phone2 || "";
+    document.getElementById("edit-address").value = client.address || "";
+    document.getElementById("edit-lastgroom").value = client.lastGroom || "";
+    document.getElementById("edit-error").style.display = "none";
+    document.getElementById("archive-btn").textContent = client.archived ? "Unarchive" : "Archive";
+    document.getElementById("detail-name-row").style.display = "none";
+    document.getElementById("detail-facts").style.display = "none";
+    document.getElementById("edit-client-form").style.display = "flex";
+    document.getElementById("edit-name").focus();
+  });
+  document.getElementById("cancel-edit-btn").addEventListener("click", renderDetail);
+  document.getElementById("edit-name").addEventListener("input", () => {
+    document.getElementById("edit-error").style.display = "none";
+  });
+  document.getElementById("save-edit-btn").addEventListener("click", async () => {
+    const client = clientById(selectedId);
+    if (!client) return;
+    const name = document.getElementById("edit-name").value.trim();
+    if (!name){
+      document.getElementById("edit-error").style.display = "block";
+      document.getElementById("edit-name").focus();
+      return;
+    }
+    client.name = name;
+    client.dogInfo = document.getElementById("edit-dog").value.trim();
+    client.dogName = "";
+    client.dogBreed = "";
+    client.phone1 = document.getElementById("edit-phone1").value.trim();
+    client.phone2 = document.getElementById("edit-phone2").value.trim();
+    client.address = document.getElementById("edit-address").value.trim();
+    client.lastGroom = document.getElementById("edit-lastgroom").value.trim();
+    client.updatedAt = new Date().toISOString();
+    dirty = true;
+    renderList();
+    renderDetail();
+    await flushSave();
+  });
+  document.getElementById("archive-btn").addEventListener("click", async () => {
+    const client = clientById(selectedId);
+    if (!client) return;
+    if (!client.archived && !confirm("Archive " + (client.name || "this client") +
+        "?\n\nThey'll be hidden from the list but not deleted — tick “Show archived” to bring them back."))
+      return;
+    client.archived = !client.archived;
+    client.updatedAt = new Date().toISOString();
+    dirty = true;
+    if (client.archived && !showArchived) selectedId = null;
+    renderAll();
+    await flushSave();
+    toast(client.archived ? "Archived." : "Restored.");
+  });
+
+  /* ---- global ---- */
+  window.addEventListener("keydown", (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "s"){
+      e.preventDefault();
+      clearTimeout(saveTimer);
+      commitNotes();
+      flushSave();
+    }
+  });
+  window.addEventListener("focus", maybeReloadFromDisk);
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) maybeReloadFromDisk(); });
+  window.addEventListener("beforeunload", (e) => {
+    try{ if (dirty) saveLocalBackup(); }catch(_){}
+    if (dirty && !fileHandle){ e.preventDefault(); e.returnValue = ""; }
+  });
+}
+
+(async function init(){
+  wireEvents();
+
+  if (FS_API){
+    const stored = await idbGet(IDB_HANDLE_KEY);
+    if (stored){
+      try{
+        const perm = await handlePermission(stored, false);
+        if (perm === "granted"){
+          fileHandle = stored;
+          fileName = stored.name;
+          await readFromFile();
+        } else {
+          pendingHandle = stored;
+        }
+      }catch(e){
+        console.warn("stored handle unusable", e);
+        await idbDel(IDB_HANDLE_KEY);
+      }
+    }
+  }
+
+  if (!db){
+    const backup = loadLocalBackup();
+    if (backup && backup.db && Array.isArray(backup.db.clients)){
+      db = migrate(backup.db);
+      if (!pendingHandle && backup.fromFile) fileName = backup.fromFile;
+    } else {
+      db = seedDb();
+      saveLocalBackup();
+    }
+  }
+
+  renderAll();
+  updateStorageBar();
+
+  if (pendingHandle){
+    showNotice("warn",
+      "Your database file needs to be reconnected (browsers ask again after a restart).",
+      [{ label: "Reconnect now", onClick: () => document.getElementById("link-file-btn").click() }]);
+  } else if (!fileHandle){
+    showNotice("warn",
+      FS_API
+        ? "You're working from a local copy. Link a database file (ideally in an iCloud/Dropbox folder) so both computers stay in sync."
+        : "This browser can't save to a file. Open in Chrome or Edge, or use Export/Import to move data between computers.",
+      !fileHandle && FS_API ? [{ label: "Link database file…", onClick: () => document.getElementById("link-file-btn").click() }] : []);
+  }
+})();
+
+/* ---- service worker (only when hosted over http/https) ---- */
+if ("serviceWorker" in navigator && location.protocol.startsWith("http")){
+  navigator.serviceWorker.register("sw.js").catch(() => {});
+}
+</script>
+
+</body>
+</html>
